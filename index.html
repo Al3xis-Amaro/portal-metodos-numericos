@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Métodos Numéricos</title>
+<meta name="description" content="Recurso educativo e interactivo sobre los fundamentos del análisis numérico y la teoría del error.">
+<!-- Vista previa al compartir el enlace (WhatsApp, Classroom, etc.).
+     Cuando publiques la página, cambia og:image y og:url por la dirección completa,
+     p. ej. https://usuario.github.io/portal-metodos-numericos/og-image.png -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Portal de Métodos Numéricos">
+<meta property="og:description" content="Glosario visual, clasificación de errores, caso práctico paso a paso y zona interactiva con calculadora de errores.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:url" content="">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2f5bd3">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f5bd3'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='white' font-family='Georgia,serif' font-style='italic'%3E%CE%B5%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script defer src="vendor/katex/katex.min.js"></script>
+<script defer src="vendor/katex/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --surface: #ffffff;
+    --surface-2: #eef1f8;
+    --text: #1b2033;
+    --muted: #5b6380;
+    --border: #d9deea;
+    --primary: #2f5bd3;
+    --primary-soft: #e3eafc;
+    --accent: #e0662f;
+    --ok: #1f8a5b;
+    --ok-soft: #e1f4ea;
+    --bad: #c23a3a;
+    --bad-soft: #fbe5e5;
+    --warn: #b7791f;
+    --target-ring: #c9d2e6;
+    --target-center: #e0662f;
+    --shadow: 0 1px 2px rgba(20,30,60,.06), 0 4px 16px rgba(20,30,60,.06);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1320; --surface: #171c2c; --surface-2: #1f2538; --text: #e7eaf3;
+      --muted: #9aa3bf; --border: #2c3450; --primary: #7d9cff; --primary-soft: #232e52;
+      --accent: #ff8a52; --ok: #4cc58c; --ok-soft: #173327; --bad: #ff7272; --bad-soft: #3a1c1f;
+      --warn: #e3b04b; --target-ring: #39425f; --target-center: #ff8a52;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1320; --surface: #171c2c; --surface-2: #1f2538; --text: #e7eaf3;
+    --muted: #9aa3bf; --border: #2c3450; --primary: #7d9cff; --primary-soft: #232e52;
+    --accent: #ff8a52; --ok: #4cc58c; --ok-soft: #173327; --bad: #ff7272; --bad-soft: #3a1c1f;
+    --warn: #e3b04b; --target-ring: #39425f; --target-center: #ff8a52;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  h1, h2, h3 { line-height: 1.25; }
+  h2 { font-size: 1.6rem; margin: 0 0 .4rem; }
+  h3 { font-size: 1.1rem; margin: 0 0 .5rem; }
+  p { margin: 0 0 .8rem; }
+  .muted { color: var(--muted); }
+  code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  /* Header */
+  header.hero {
+    background: linear-gradient(135deg, #1f3c8f, #2f5bd3 55%, #4b7bec);
+    color: #fff; padding: 40px 0 28px;
+  }
+  .hero h1 { margin: 0 0 .4rem; font-size: clamp(1.7rem, 4vw, 2.5rem); }
+  .hero p { margin: 0; max-width: 720px; opacity: .92; }
+  .hero .tag { display: inline-block; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase;
+    background: rgba(255,255,255,.16); padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .theme-btn { position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,.18); color: #fff;
+    border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: .85rem; }
+  .hero-inner { position: relative; }
+
+  /* Tabs */
+  nav.tabs { position: sticky; top: 0; z-index: 10; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); }
+  .tabs ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .tabs ul::-webkit-scrollbar { display: none; }
+  .tabs button {
+    background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted);
+    padding: 14px 14px 11px; font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .tabs button .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--surface-2); font-size: .78rem; margin-right: 6px; }
+  .tabs button[aria-selected="true"] { color: var(--primary); border-bottom-color: var(--primary); }
+  .tabs button[aria-selected="true"] .n { background: var(--primary); color: #fff; }
+  @media (max-width: 640px) {
+    .tabs ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .tabs button { width: 100%; padding: 10px 6px 8px; font-size: .85rem; white-space: normal; text-align: left; }
+  }
+  .tabs button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+
+  main { padding: 36px 0 48px; }
+  section.panel { scroll-margin-top: 70px; }
+  section.panel { display: none; }
+  section.panel.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .lead { font-size: 1.05rem; color: var(--muted); max-width: 800px; margin-bottom: 1.4rem; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+
+  /* Glossary */
+  .concept { display: flex; flex-direction: column; }
+  .concept .num { font-size: .78rem; font-weight: 700; color: var(--primary); letter-spacing: .05em; text-transform: uppercase; }
+  .concept svg { width: 100%; height: 150px; background: var(--surface-2); border-radius: 10px; margin: 10px 0 12px; }
+  .concept .eng { margin-top: auto; background: var(--primary-soft); border-radius: 10px; padding: 10px 12px; font-size: .92rem; }
+  .concept .eng b { color: var(--primary); }
+  .sf { display: inline-block; padding: 0 2px; border-radius: 4px; }
+  .sf.y { background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+  .sf.n { color: var(--muted); text-decoration: line-through; }
+
+  .targets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 14px; margin-top: 12px; }
+  .targets figure { margin: 0; text-align: center; }
+  .targets svg { width: 100%; max-width: 180px; height: auto; }
+  .targets figcaption { font-size: .9rem; }
+  .targets figcaption b { display: block; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; min-width: 720px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .katex, .table-wrap { position: relative; }
+  th .katex { text-transform: none; font-size: 1.15rem; }
+  th { background: var(--surface-2); font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  tr:last-child td { border-bottom: 0; }
+  td.type { font-weight: 700; white-space: nowrap; }
+  .pill { display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-top: 4px; }
+  .pill.medida { background: var(--primary-soft); color: var(--primary); }
+  .pill.fuente { background: var(--bad-soft); color: var(--bad); }
+
+  /* Concept map */
+  .cmap { display: grid; gap: 12px; justify-items: center; margin: 8px 0 24px; }
+  .cmap .root { background: var(--primary); color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 700; }
+  .cmap .branches { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; width: 100%; }
+  .cmap .branch { border: 2px dashed var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+  .cmap .branch h4 { margin: 0 0 8px; font-size: .95rem; }
+  .cmap .leaf { display: inline-block; margin: 4px; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: .9rem; }
+  .cmap .medida .leaf { background: var(--primary-soft); color: var(--primary); }
+  .cmap .fuente .leaf { background: var(--bad-soft); color: var(--bad); }
+
+  .demo-box { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
+  .big-mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.05rem; word-break: break-all; }
+
+  /* Steps */
+  .steps { counter-reset: s; display: grid; gap: 14px; }
+  .step { position: relative; padding-left: 54px; }
+  .step::before { counter-increment: s; content: counter(s); position: absolute; left: 18px; top: 18px;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem; }
+  .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 14px; }
+  .compare .col h4 { margin: 0 0 6px; }
+  .compare .col, .step, .card { min-width: 0; }
+  @media (max-width: 520px) { .step { padding-left: 20px; padding-top: 52px; } }
+  .katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+  .result { font-weight: 700; color: var(--accent); }
+
+  .scenario { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 14px; margin-top: 12px; }
+  .scenario .card { border-left: 5px solid var(--ok); }
+  .scenario .card.bad { border-left-color: var(--bad); }
+  .verdict { font-weight: 700; }
+  .verdict.ok { color: var(--ok); } .verdict.bad { color: var(--bad); }
+
+  /* Interactive */
+  label { font-weight: 600; font-size: .92rem; display: block; margin-bottom: 4px; }
+  input[type=number], input[type=text], select {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font: inherit;
+  }
+  input[type=range] { width: 100%; accent-color: var(--primary); }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px; margin-bottom: 14px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 10px; }
+  .kpi { background: var(--surface-2); border-radius: 10px; padding: 12px; }
+  .kpi .k { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .kpi .v { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.1rem; font-weight: 700; word-break: break-all; }
+  .bar { height: 10px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+  .bar > span { display: block; height: 100%; background: var(--primary); width: 0; transition: width .3s; }
+  .btn { background: var(--primary); color: #fff; border: 0; border-radius: 10px; padding: 10px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  .btn.ghost { background: var(--surface-2); color: var(--text); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #simTarget { width: 100%; max-width: 320px; display: block; margin: 0 auto; }
+  .sim-wrap { display: grid; grid-template-columns: minmax(0, 320px) 1fr; gap: 20px; align-items: center; }
+  @media (max-width: 680px) { .sim-wrap { grid-template-columns: 1fr; } }
+
+  .quiz .q { margin-bottom: 18px; }
+  .quiz .opts { display: grid; gap: 8px; margin-top: 8px; }
+  .quiz .opt { text-align: left; background: var(--surface-2); border: 2px solid transparent; color: var(--text);
+    border-radius: 10px; padding: 10px 12px; font: inherit; cursor: pointer; }
+  .quiz .opt:hover:not(:disabled) { border-color: var(--primary); }
+  .quiz .opt.correct { background: var(--ok-soft); border-color: var(--ok); }
+  .quiz .opt.wrong { background: var(--bad-soft); border-color: var(--bad); }
+  .quiz .opt:disabled { cursor: default; }
+  .quiz .fb { font-size: .92rem; margin-top: 6px; }
+  .score { font-weight: 700; font-size: 1.1rem; }
+
+  .section-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: .3rem; }
+  .section-title .badge { background: var(--primary-soft); color: var(--primary); font-weight: 700; font-size: .8rem; padding: 3px 10px; border-radius: 999px; }
+  .mt { margin-top: 28px; }
+  .pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 32px; flex-wrap: wrap; }
+
+  /* Selector de caso */
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 4px; background: var(--surface-2); border-radius: 999px; padding: 4px; margin-bottom: 18px; }
+  .seg-btn { border: 0; background: none; color: var(--muted); font: inherit; font-weight: 600; padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+  .seg-btn[aria-pressed="true"] { background: var(--surface); color: var(--primary); box-shadow: var(--shadow); }
+  .seg-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .note { background: var(--primary-soft); border-radius: 10px; padding: 10px 14px; margin-top: 12px; }
+
+  /* Gráficas */
+  .chart { width: 100%; max-width: 720px; height: auto; display: block; margin: 0 auto; }
+  .chart text { fill: var(--text); font-size: 13px; font-family: inherit; }
+  .chart .axis { stroke: var(--border); }
+  .chart .grid-l { stroke: var(--border); stroke-dasharray: 3 4; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .9rem; margin-top: 6px; }
+  .legend i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  /* Ejercicio */
+  .ex-q { font-size: 1.05rem; margin-bottom: 10px; }
+  .ex-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+  .ex-row > div { flex: 1 1 200px; min-width: 0; }
+  .ex-fb { margin-top: 12px; }
+  .ex-sol { background: var(--surface-2); border-radius: 10px; padding: 10px 14px; margin-top: 10px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .92rem; overflow-x: auto; }
+
+  /* Formulario externo */
+  .ext-quiz { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; background: var(--primary-soft); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; }
+  .ext-quiz p { margin: 0; }
+  a.btn { text-decoration: none; display: inline-block; }
+
+  /* Portada */
+  .brand { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .brand .logo { height: 44px; width: auto; background: #fff; border-radius: 8px; padding: 4px 8px; }
+  .brand .tag { margin: 0; border-radius: 12px; }
+  @media (max-width: 640px) { .theme-btn { position: static; margin-bottom: 12px; } .brand .tag { font-size: .7rem; } }
+  .hero-inner > .theme-btn { z-index: 1; }
+  .hero .meta { margin-top: 14px; font-size: .95rem; opacity: .95; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .hero .meta span b { font-weight: 700; }
+  .hero .meta:empty { display: none; }
+
+  /* Créditos */
+  .credits { padding-bottom: 40px; }
+  .credits h2 { font-size: 1.3rem; }
+  .team-list { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 8px; }
+  .team-list li { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .team-list .av { width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-size: .85rem; flex: none; }
+  .refs { padding-left: 20px; margin: 0; display: grid; gap: 8px; font-size: .95rem; }
+
+  /* Volver arriba */
+  .to-top { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--primary); color: #fff; font-size: 1.3rem;
+    box-shadow: var(--shadow); cursor: pointer; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity .2s, transform .2s; z-index: 20; }
+  .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+  .to-top:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } section.panel.active { animation: none; } .bar > span, .to-top { transition: none; } }
+
+  footer { border-top: 1px solid var(--border); padding: 20px 0 32px; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Cambiar tema">◐ Tema</button>
+    <div class="brand">
+      <!-- Para mostrar el logo, guarda la imagen como logo.png junto a index.html -->
+      <img src="logo.png" alt="Logo de la universidad" class="logo" onerror="this.remove()">
+      <span class="tag">Universidad Tecnológica de la Zona Metropolitana del Valle de México · Métodos Numéricos</span>
+    </div>
+    <h1>Portal de Métodos Numéricos</h1>
+    <p>Fundamentos del análisis numérico y teoría del error: qué es, cómo se clasifica, cómo se calcula y por qué importa en ingeniería.</p>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Secciones">
+  <div class="wrap">
+    <ul role="tablist">
+      <li><button role="tab" data-tab="glosario" aria-selected="true"><span class="n">1</span>Inicio y Glosario</button></li>
+      <li><button role="tab" data-tab="errores" aria-selected="false"><span class="n">2</span>Clasificación de Errores</button></li>
+      <li><button role="tab" data-tab="caso" aria-selected="false"><span class="n">3</span>Caso Práctico</button></li>
+      <li><button role="tab" data-tab="interactiva" aria-selected="false"><span class="n">4</span>Zona Interactiva</button></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ===================== SECCIÓN 1 ===================== -->
+<section class="panel active" id="glosario" role="tabpanel">
+  <div class="section-title"><span class="badge">Sección 1</span><h2>Inicio y Glosario Visual</h2></div>
+  <p class="lead">Una computadora no "piensa" con números infinitos: trabaja con cantidades finitas de dígitos y con pasos repetidos. Para usarla bien en ingeniería necesitamos un vocabulario común. Estos son los 8 conceptos base, explicados con nuestras palabras y con un ejemplo de ingeniería cada uno.</p>
+
+  <div class="grid g2">
+
+    <!-- 1 Método numérico -->
+    <article class="card concept">
+      <span class="num">Concepto 1</span>
+      <h3>Método numérico</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Curva que cruza el eje con aproximaciones sucesivas x0, x1, x2 acercándose a la raíz">
+        <line x1="20" y1="100" x2="285" y2="100" stroke="var(--muted)" stroke-width="1.5"/>
+        <path d="M30 140 C 90 135, 140 110, 170 100 S 250 40, 280 15" fill="none" stroke="var(--primary)" stroke-width="3"/>
+        <circle cx="170" cy="100" r="6" fill="var(--accent)"/>
+        <text x="164" y="88" font-size="11" fill="var(--accent)" font-weight="700" text-anchor="end">raíz</text>
+        <g fill="var(--text)" font-size="11">
+          <line x1="265" y1="100" x2="265" y2="28" stroke="var(--muted)" stroke-dasharray="3 3"/><circle cx="265" cy="100" r="4"/><text x="258" y="116">x₀</text>
+          <line x1="215" y1="100" x2="215" y2="72" stroke="var(--muted)" stroke-dasharray="3 3"/><circle cx="215" cy="100" r="4"/><text x="208" y="116">x₁</text>
+          <line x1="185" y1="100" x2="185" y2="94" stroke="var(--muted)" stroke-dasharray="3 3"/><circle cx="185" cy="100" r="4"/><text x="181" y="116">x₂</text>
+        </g>
+        <path d="M262 22 Q 240 10 218 66" fill="none" stroke="var(--muted)" stroke-width="1" marker-end="url(#arr)"/>
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--muted)"/></marker></defs>
+        <text x="24" y="24" font-size="12" fill="var(--muted)">cada paso se acerca más</text>
+      </svg>
+      <p>Es una "receta" de operaciones simples (sumas, restas, multiplicaciones, divisiones) que se repite paso a paso para llegar a una respuesta aproximada de un problema que no sabemos —o no conviene— resolver de forma exacta con álgebra.</p>
+      <div class="eng"><b>Ingeniería:</b> calcular la deflexión de una viga con cargas irregulares, o el punto donde un tanque se llena a cierto nivel, usando iteraciones (bisección, Newton-Raphson) en lugar de una fórmula cerrada.</div>
+    </article>
+
+    <!-- 2 Aproximación -->
+    <article class="card concept">
+      <span class="num">Concepto 2</span>
+      <h3>Aproximación</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Círculo aproximado por un hexágono y por un dodecágono">
+        <g transform="translate(80 75)">
+          <circle r="55" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+          <polygon points="55,0 27.5,47.6 -27.5,47.6 -55,0 -27.5,-47.6 27.5,-47.6" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-size="12" fill="var(--text)">6 lados</text>
+        </g>
+        <g transform="translate(220 75)">
+          <circle r="55" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+          <polygon points="55,0 47.6,27.5 27.5,47.6 0,55 -27.5,47.6 -47.6,27.5 -55,0 -47.6,-27.5 -27.5,-47.6 0,-55 27.5,-47.6 47.6,-27.5" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-size="12" fill="var(--text)">12 lados</text>
+        </g>
+      </svg>
+      <p>Es un valor que <em>no es</em> el verdadero, pero que está lo suficientemente cerca para que sea útil. Lo aceptamos porque el valor exacto es imposible de obtener o porque sería demasiado costoso conseguirlo.</p>
+      <div class="eng"><b>Ingeniería:</b> un CAD dibuja un círculo como un polígono de muchos lados; entre más lados, mejor la aproximación. Igual al usar <span class="mono">g ≈ 9.81 m/s²</span> o <span class="mono">π ≈ 3.1416</span>.</div>
+    </article>
+
+    <!-- 3 Error numérico -->
+    <article class="card concept">
+      <span class="num">Concepto 3</span>
+      <h3>Error numérico</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Recta numérica con valor verdadero y valor aproximado; la distancia entre ellos es el error">
+        <line x1="20" y1="90" x2="280" y2="90" stroke="var(--muted)" stroke-width="2"/>
+        <g stroke="var(--muted)"><line x1="40" y1="85" x2="40" y2="95"/><line x1="100" y1="85" x2="100" y2="95"/><line x1="160" y1="85" x2="160" y2="95"/><line x1="220" y1="85" x2="220" y2="95"/><line x1="260" y1="85" x2="260" y2="95"/></g>
+        <circle cx="105" cy="90" r="7" fill="var(--primary)"/>
+        <text x="105" y="120" text-anchor="middle" font-size="12" fill="var(--primary)" font-weight="700">valor verdadero</text>
+        <circle cx="215" cy="90" r="7" fill="var(--accent)"/>
+        <text x="215" y="120" text-anchor="middle" font-size="12" fill="var(--accent)" font-weight="700">aproximación</text>
+        <line x1="107" y1="55" x2="213" y2="55" stroke="var(--text)" stroke-width="1.5" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+        <defs><marker id="arr2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="var(--text)"/></marker></defs>
+        <text x="160" y="45" text-anchor="middle" font-size="13" fill="var(--text)" font-weight="700">error</text>
+      </svg>
+      <p>Es la diferencia entre lo que <em>debería</em> salir (valor verdadero) y lo que realmente obtuvimos (valor aproximado). No significa que alguien "se equivocó": es el precio inevitable de trabajar con dígitos finitos y pasos finitos.</p>
+      <div class="eng"><b>Ingeniería:</b> un simulador de estructuras reporta 12.48 kN en un apoyo y la medición real es 12.50 kN: hay un error de 0.02 kN que hay que saber si es tolerable.</div>
+    </article>
+
+    <!-- 4 Cifra significativa -->
+    <article class="card concept">
+      <span class="num">Concepto 4</span>
+      <h3>Cifra significativa</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Ejemplos de conteo de cifras significativas">
+        <g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="20">
+          <text x="20" y="40" fill="var(--muted)">0.00</text><text x="68" y="40" fill="var(--ok)" font-weight="700">450</text><text x="125" y="40" font-size="13" fill="var(--text)">m → 3 cifras</text>
+          <text x="20" y="82" fill="var(--ok)" font-weight="700">3.1416</text><text x="125" y="82" font-size="13" fill="var(--text)">→ 5 cifras</text>
+          <text x="20" y="124" fill="var(--ok)" font-weight="700">1.20</text><text x="68" y="124" fill="var(--muted)">×10³</text><text x="125" y="124" font-size="13" fill="var(--text)">N → 3 cifras</text>
+        </g>
+      </svg>
+      <p>Son los dígitos de un número que sí aportan información confiable. Se cuentan desde el primer dígito distinto de cero. Los ceros a la izquierda solo marcan la posición del punto decimal; los ceros a la derecha <em>después del punto</em> sí cuentan, porque dicen "medí hasta aquí".</p>
+      <div class="eng"><b>Ingeniería:</b> un calibrador vernier marca <span class="mono">12.50 mm</span> (4 cifras): ese último 0 dice que el instrumento distingue centésimas. Escribir "12.5 mm" estaría tirando información.</div>
+    </article>
+
+    <!-- 5 Precisión -->
+    <article class="card concept">
+      <span class="num">Concepto 5</span>
+      <h3>Precisión</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Diana con tiros muy agrupados entre sí pero lejos del centro">
+        <g transform="translate(200 75)">
+          <circle r="62" fill="none" stroke="var(--target-ring)" stroke-width="10"/>
+          <circle r="40" fill="none" stroke="var(--target-ring)" stroke-width="10"/>
+          <circle r="16" fill="var(--target-center)"/>
+          <g fill="var(--primary)"><circle cx="34" cy="-30" r="5"/><circle cx="40" cy="-26" r="5"/><circle cx="31" cy="-22" r="5"/><circle cx="38" cy="-35" r="5"/><circle cx="44" cy="-31" r="5"/></g>
+        </g>
+        <text x="14" y="70" font-size="12" fill="var(--muted)"><tspan>agrupados</tspan><tspan x="14" dy="16">= preciso</tspan></text>
+      </svg>
+      <p>Qué tanto se parecen entre sí varias mediciones o cálculos repetidos de lo mismo. Si siempre obtengo casi el mismo número, soy preciso, <em>aunque ese número esté mal</em>. En cómputo, también se refiere a cuántos dígitos se manejan (precisión simple vs. doble).</p>
+      <div class="eng"><b>Ingeniería:</b> una CNC que corta 100 piezas y todas miden 50.03 ± 0.002 mm es muy precisa (repetible), aunque el valor nominal fuera 50.00 mm.</div>
+    </article>
+
+    <!-- 6 Exactitud -->
+    <article class="card concept">
+      <span class="num">Concepto 6</span>
+      <h3>Exactitud</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Diana con tiros dispersos pero alrededor del centro">
+        <g transform="translate(200 75)">
+          <circle r="62" fill="none" stroke="var(--target-ring)" stroke-width="10"/>
+          <circle r="40" fill="none" stroke="var(--target-ring)" stroke-width="10"/>
+          <circle r="16" fill="var(--target-center)"/>
+          <g fill="var(--primary)"><circle cx="-6" cy="4" r="5"/><circle cx="8" cy="-7" r="5"/><circle cx="3" cy="9" r="5"/><circle cx="-4" cy="-6" r="5"/><circle cx="7" cy="5" r="5"/></g>
+        </g>
+        <text x="14" y="70" font-size="12" fill="var(--muted)"><tspan>alrededor del</tspan><tspan x="14" dy="16">centro = exacto</tspan></text>
+      </svg>
+      <p>Qué tan cerca está el resultado (o el promedio de los resultados) del valor verdadero. La exactitud se mide con el error: a menor error, mayor exactitud. Ser exacto y ser preciso son cosas <strong>distintas</strong>, como muestra el tiro al blanco de abajo.</p>
+      <div class="eng"><b>Ingeniería:</b> un manómetro recién calibrado con un patrón certificado da lecturas centradas en la presión real: es exacto.</div>
+    </article>
+
+    <!-- 7 Incertidumbre -->
+    <article class="card concept">
+      <span class="num">Concepto 7</span>
+      <h3>Incertidumbre</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Medición 25.4 más menos 0.1 milímetros representada con una barra de intervalo">
+        <line x1="30" y1="80" x2="270" y2="80" stroke="var(--muted)" stroke-width="2"/>
+        <rect x="100" y="66" width="100" height="28" rx="6" fill="var(--primary-soft)" stroke="var(--primary)"/>
+        <line x1="100" y1="58" x2="100" y2="102" stroke="var(--primary)" stroke-width="2.5"/>
+        <line x1="200" y1="58" x2="200" y2="102" stroke="var(--primary)" stroke-width="2.5"/>
+        <circle cx="150" cy="80" r="6" fill="var(--accent)"/>
+        <text x="150" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)" font-family="ui-monospace, Menlo, monospace">25.4 ± 0.1 mm</text>
+        <text x="100" y="122" text-anchor="middle" font-size="12" fill="var(--muted)">25.3</text>
+        <text x="200" y="122" text-anchor="middle" font-size="12" fill="var(--muted)">25.5</text>
+        <text x="150" y="140" text-anchor="middle" font-size="11" fill="var(--muted)">el valor real está "por aquí"</text>
+      </svg>
+      <p>Es la duda honesta que acompaña a todo resultado: un intervalo donde creemos que está el valor verdadero. No es lo mismo que el error (que requiere conocer el valor real); la incertidumbre la estimamos <em>sin</em> conocerlo.</p>
+      <div class="eng"><b>Ingeniería:</b> un plano indica un barreno de Ø 25.4 ± 0.1 mm. Cualquier pieza entre 25.3 y 25.5 mm se acepta; la tolerancia es la incertidumbre permitida.</div>
+    </article>
+
+    <!-- 8 Sesgo -->
+    <article class="card concept">
+      <span class="num">Concepto 8</span>
+      <h3>Sesgo</h3>
+      <svg viewBox="0 0 300 150" role="img" aria-label="Histograma de mediciones desplazado a la derecha del valor verdadero">
+        <line x1="20" y1="120" x2="285" y2="120" stroke="var(--muted)" stroke-width="1.5"/>
+        <line x1="100" y1="20" x2="100" y2="120" stroke="var(--primary)" stroke-width="2.5" stroke-dasharray="5 4"/>
+        <text x="100" y="138" text-anchor="middle" font-size="11" fill="var(--primary)" font-weight="700">valor real</text>
+        <g fill="var(--accent)" opacity=".85">
+          <rect x="150" y="96" width="16" height="24"/><rect x="168" y="66" width="16" height="54"/><rect x="186" y="40" width="16" height="80"/><rect x="204" y="62" width="16" height="58"/><rect x="222" y="94" width="16" height="26"/>
+        </g>
+        <line x1="194" y1="28" x2="194" y2="120" stroke="var(--accent)" stroke-width="2"/>
+        <text x="194" y="138" text-anchor="middle" font-size="11" fill="var(--accent)" font-weight="700">promedio</text>
+        <line x1="104" y1="30" x2="190" y2="30" stroke="var(--text)" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <defs><marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--text)"/></marker></defs>
+        <text x="147" y="22" text-anchor="middle" font-size="12" fill="var(--text)" font-weight="700">sesgo</text>
+      </svg>
+      <p>Es un error que siempre empuja el resultado hacia el mismo lado. Repetir la medición no lo elimina, porque todas las repeticiones arrastran el mismo "jalón". Se corrige calibrando o cambiando el método, no promediando.</p>
+      <div class="eng"><b>Ingeniería:</b> una báscula de camiones mal calibrada que siempre marca +40 kg. También un algoritmo que siempre trunca (corta) en vez de redondear: el error siempre resulta hacia abajo.</div>
+    </article>
+  </div>
+
+  <div class="card mt">
+    <h3>Comparativa "tiro al blanco": precisión vs. exactitud</h3>
+    <p class="muted">El centro rojo es el valor verdadero; los puntos son mediciones repetidas.</p>
+    <div class="targets" id="targets"></div>
+  </div>
+
+  <div class="pager"><span></span><button class="btn" data-go="errores">Siguiente: Clasificación de errores →</button></div>
+</section>
+
+<!-- ===================== SECCIÓN 2 ===================== -->
+<section class="panel" id="errores" role="tabpanel">
+  <div class="section-title"><span class="badge">Sección 2</span><h2>Clasificación de los Errores Numéricos</h2></div>
+  <p class="lead">Hay dos preguntas distintas: <strong>¿cuánto</strong> nos equivocamos? (formas de <em>medir</em> el error) y <strong>¿por qué</strong> nos equivocamos? (<em>fuentes</em> del error). Absoluto y relativo responden la primera; redondeo y truncamiento, la segunda.</p>
+
+  <div class="cmap" aria-label="Mapa conceptual de errores">
+    <div class="root">Error numérico &nbsp; \(E = V_v - V_a\)</div>
+    <div class="branches">
+      <div class="branch medida"><h4>¿Cuánto? — Formas de medirlo</h4><span class="leaf">Error absoluto</span><span class="leaf">Error relativo (y %)</span></div>
+      <div class="branch fuente"><h4>¿Por qué? — Fuentes de error</h4><span class="leaf">Error por redondeo</span><span class="leaf">Error por truncamiento</span></div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Tipo</th><th>¿Qué es?</th><th>Fórmula</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="type">Error absoluto<br><span class="pill medida">medida</span></td>
+          <td>La distancia entre el valor verdadero y el aproximado, en las <strong>mismas unidades</strong> del problema. Se usa valor absoluto porque solo importa qué tan lejos quedamos, no hacia qué lado.</td>
+          <td>\[E_a = |V_v - V_a|\]</td>
+          <td>Viga real de 6.00 m, medida 5.98 m → \(E_a = 0.02\) m.</td>
+        </tr>
+        <tr>
+          <td class="type">Error relativo<br><span class="pill medida">medida</span></td>
+          <td>El error absoluto comparado con el tamaño del valor verdadero. Es <strong>adimensional</strong>, así que permite comparar errores de cosas muy distintas. Multiplicado por 100 da el error porcentual.</td>
+          <td>\[E_r = \frac{|V_v - V_a|}{|V_v|}\]\[E_\% = E_r \times 100\%\]</td>
+          <td>Ver abajo: "¿por qué es más útil?".</td>
+        </tr>
+        <tr>
+          <td class="type">Error por redondeo<br><span class="pill fuente">fuente</span></td>
+          <td>Aparece porque la computadora o calculadora solo guarda un número limitado de dígitos (en binario). Al ajustar el número a esos dígitos, se pierde un "pedacito". En muchas operaciones, esos pedacitos se acumulan.</td>
+          <td>\[E_{red} = |x - fl(x)|\]<span class="muted" style="font-size:.85rem">\(fl(x)\): número que realmente guarda la máquina. Con \(n\) cifras, \(E_r \le \tfrac12\,10^{1-n}\).</span></td>
+          <td>\(\tfrac{2}{3} = 0.6666\ldots\) con 4 cifras se guarda como 0.6667 → \(E_{red} \approx 3.3\times10^{-5}\).</td>
+        </tr>
+        <tr>
+          <td class="type">Error por truncamiento<br><span class="pill fuente">fuente</span></td>
+          <td>Aparece cuando cortamos un proceso infinito (una serie, un límite, una iteración) en un número finito de pasos, o cuando simplemente "cortamos" decimales sin redondear. Es culpa del <strong>método</strong>, no de la máquina.</td>
+          <td>\[E_t = \left|\,f(x) - \sum_{k=0}^{n} a_k\,\right|\]<span class="muted" style="font-size:.85rem">lo que dejamos fuera de la serie</span></td>
+          <td>\(e = \sum \frac{1}{k!}\). Usar solo 5 términos (\(k=0..4\)) da 2.70833 → \(E_t \approx 0.00995\).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g2 mt">
+    <div class="card">
+      <h3>¿Por qué el relativo es más útil que el absoluto?</h3>
+      <p>El absoluto no dice si el error es "grande" o "pequeño" porque no considera la escala. Un error de <strong>1 cm</strong> parece igual en ambos casos:</p>
+      <div class="table-wrap" style="box-shadow:none">
+        <table style="min-width:0">
+          <thead><tr><th>Medición</th><th>\(E_a\)</th><th>\(E_\%\)</th></tr></thead>
+          <tbody>
+            <tr><td>Puente de 500 m</td><td>1 cm</td><td><span class="verdict ok">0.002 %</span></td></tr>
+            <tr><td>Remache de 2 cm</td><td>1 cm</td><td><span class="verdict bad">50 %</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:10px">En el puente es irrelevante; en el remache, la pieza es inútil. El relativo pone al error "en proporción".</p>
+    </div>
+
+    <div class="card">
+      <h3>Redondeo en vivo: tu navegador</h3>
+      <p>Las computadoras guardan números en binario. 0.1 en binario es periódico (como 1/3 en decimal), así que se guarda redondeado. Mira lo que calcula este navegador ahora mismo:</p>
+      <div class="demo-box"><div class="big-mono">0.1 + 0.2 = <span id="liveRound" class="result"></span></div></div>
+      <div class="demo-box"><div class="big-mono">Sumar 0.1 diez veces = <span id="liveRound2" class="result"></span></div></div>
+      <p class="muted" style="margin-top:10px;font-size:.92rem">Caso real: en 1991 un sistema de misiles Patriot acumulaba el tiempo en pasos de 0.1 s con 24 bits; tras 100 horas el reloj se había desfasado ~0.34 s y falló en interceptar un proyectil.</p>
+    </div>
+  </div>
+
+  <div class="card mt">
+    <h3>Truncamiento en vivo: la serie de \(e\)</h3>
+    <p>\(e = 1 + \frac{1}{1!} + \frac{1}{2!} + \frac{1}{3!} + \cdots\) es una suma infinita. Mueve el control para decidir en qué término "cortamos".</p>
+    <div class="row" style="align-items:end">
+      <div><label for="nTerms">Términos usados: <span id="nTermsOut">5</span></label><input type="range" id="nTerms" min="1" max="12" value="5"></div>
+      <div class="kpi"><div class="k">Aproximación</div><div class="v" id="taylorApprox"></div></div>
+      <div class="kpi"><div class="k">Error de truncamiento</div><div class="v" id="taylorErr"></div></div>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="taylorBar"></span></div>
+    <p class="muted" style="font-size:.9rem;margin-top:6px">Barra: cifras significativas correctas alcanzadas: <strong id="taylorDig"></strong> de 10. Cada término nuevo reduce el error de truncamiento.</p>
+  </div>
+
+  <div class="pager"><button class="btn ghost" data-go="glosario">← Glosario</button><button class="btn" data-go="caso">Siguiente: Caso práctico →</button></div>
+</section>
+
+<!-- ===================== SECCIÓN 3 ===================== -->
+<section class="panel" id="caso" role="tabpanel">
+  <div class="section-title"><span class="badge">Sección 3</span><h2>Caso Práctico: proceso de cálculo e interpretación</h2></div>
+  <p class="lead">Comparamos un valor verdadero conocido contra dos aproximaciones a <strong>3 cifras significativas</strong>: una truncada y una redondeada. Elige el caso; todo el desarrollo se recalcula.</p>
+  <div class="seg" role="group" aria-label="Elegir caso">
+    <button type="button" class="seg-btn" data-case="e" aria-pressed="true">Número de Euler \(e\)</button>
+    <button type="button" class="seg-btn" data-case="sqrt2" aria-pressed="false">Raíz de 2 \(\sqrt{2}\)</button>
+  </div>
+  <div id="caseBody" aria-live="polite"></div>
+
+  <div class="pager"><button class="btn ghost" data-go="errores">← Clasificación</button><button class="btn" data-go="interactiva">Siguiente: Zona interactiva →</button></div>
+</section>
+
+<!-- ===================== SECCIÓN 4 ===================== -->
+<section class="panel" id="interactiva" role="tabpanel">
+  <div class="section-title"><span class="badge">Sección 4</span><h2>Zona Interactiva y Autoevaluación</h2></div>
+  <p class="lead">Experimenta: cambia valores, dispara al blanco y pon a prueba lo que aprendiste.</p>
+
+  <!-- Calculadora -->
+  <div class="card">
+    <h3>🧮 Calculadora de errores</h3>
+    <p class="muted">Elige un valor verdadero, escribe tu aproximación y los errores se recalculan al instante.</p>
+    <div class="row">
+      <div>
+        <label for="trueSel">Valor verdadero</label>
+        <select id="trueSel">
+          <option value="e">e ≈ 2.718281828…</option>
+          <option value="sqrt2">√2 ≈ 1.414213562…</option>
+          <option value="pi">π ≈ 3.141592653…</option>
+          <option value="phi">φ (razón áurea) ≈ 1.618033988…</option>
+          <option value="custom">Otro (escríbelo)</option>
+        </select>
+      </div>
+      <div>
+        <label for="trueVal">\(V_v\)</label>
+        <input type="number" id="trueVal" step="any" readonly>
+      </div>
+      <div>
+        <label for="approxVal">Tu aproximación \(V_a\)</label>
+        <input type="number" id="approxVal" step="any" value="2.72">
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">Error absoluto</div><div class="v" id="outEa">—</div></div>
+      <div class="kpi"><div class="k">Error relativo</div><div class="v" id="outEr">—</div></div>
+      <div class="kpi"><div class="k">Error porcentual</div><div class="v" id="outEp">—</div></div>
+      <div class="kpi"><div class="k">Cifras correctas (aprox.)</div><div class="v" id="outSf">—</div></div>
+    </div>
+    <p class="muted" style="font-size:.88rem;margin-top:10px">Cifras correctas: el mayor \(n\) que cumple \(E_\% \le 0.5\times10^{2-n}\,\%\) (criterio de Scarborough).</p>
+
+    <h3 class="mt">Truncar vs. redondear a <span id="sfOut">3</span> cifras significativas</h3>
+    <input type="range" id="sfRange" min="1" max="10" value="3" aria-label="Cifras significativas">
+    <div class="table-wrap" style="margin-top:10px;box-shadow:none">
+      <table style="min-width:520px">
+        <thead><tr><th>Método</th><th>\(V_a\)</th><th>\(E_a\)</th><th>\(E_\%\)</th></tr></thead>
+        <tbody id="sfTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ejercicio -->
+  <div class="card mt">
+    <h3>✍️ Resuélvelo tú</h3>
+    <p class="muted">Calcula a mano (o con calculadora) el error relativo porcentual y comprueba tu resultado.</p>
+    <div class="ex-q" id="exQ"></div>
+    <div class="ex-row">
+      <div><label for="exAns">Tu respuesta: \(E_\%\) (en %)</label><input type="number" id="exAns" step="any" placeholder="Ej. 0.25"></div>
+      <button class="btn" id="exCheck" type="button">Comprobar</button>
+      <button class="btn ghost" id="exSolBtn" type="button">Ver solución</button>
+      <button class="btn ghost" id="exNext" type="button">Otro ejercicio</button>
+    </div>
+    <div class="ex-fb" id="exFb" aria-live="polite"></div>
+    <div class="ex-sol" id="exSol" hidden></div>
+  </div>
+
+  <!-- Error acumulado -->
+  <div class="card mt">
+    <h3>📈 Error acumulado: truncar vs. redondear en cada paso</h3>
+    <p>Un caudalímetro mide el agua que entra a un tanque cada segundo (lecturas entre 0.5 y 1.5 L) y el controlador guarda el total con <strong>2 decimales</strong>. Un controlador corta los decimales sobrantes y el otro los redondea. La gráfica muestra cuánto se aleja cada total del valor real.</p>
+    <div class="row" style="align-items:end">
+      <div><label for="accN">Segundos simulados: <span id="accNOut"></span></label><input type="range" id="accN" min="50" max="2000" step="50" value="1000"></div>
+      <div class="kpi"><div class="k">Error final truncando</div><div class="v" id="accT" style="color:var(--bad)"></div></div>
+      <div class="kpi"><div class="k">Error final redondeando</div><div class="v" id="accR" style="color:var(--ok)"></div></div>
+      <div><button class="btn ghost" id="accNew" type="button">Nuevas lecturas</button></div>
+    </div>
+    <svg class="chart" id="accChart" viewBox="0 0 640 280" role="img" aria-label="Gráfica del error acumulado contra el número de pasos"></svg>
+    <div class="legend"><span><i style="background:var(--bad)"></i>Truncando (siempre pierde, error crece)</span><span><i style="background:var(--ok)"></i>Redondeando (errores se compensan)</span></div>
+    <p class="note">Truncar pierde en promedio 0.005 L en cada paso y siempre hacia abajo: es un <strong>sesgo</strong>, y el error crece en línea recta. Al redondear, unas veces se sube y otras se baja, así que los errores se cancelan y el total se mantiene cerca del real.</p>
+  </div>
+
+  <!-- Simulador tiro al blanco -->
+  <div class="card mt">
+    <h3>🎯 Simulador: precisión vs. exactitud</h3>
+    <div class="sim-wrap">
+      <svg id="simTarget" viewBox="-110 -110 220 220" role="img" aria-label="Diana con tiros simulados"></svg>
+      <div>
+        <label for="biasR">Sesgo (afecta la <u>exactitud</u>): <span id="biasOut"></span></label>
+        <input type="range" id="biasR" min="0" max="70" value="0">
+        <label for="spreadR" style="margin-top:12px">Dispersión (afecta la <u>precisión</u>): <span id="spreadOut"></span></label>
+        <input type="range" id="spreadR" min="2" max="40" value="8">
+        <div style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap">
+          <button class="btn" id="shootBtn" type="button">Disparar 12 tiros</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="k">Distancia del promedio al centro</div><div class="v" id="simBias">—</div></div>
+          <div class="kpi"><div class="k">Desviación estándar</div><div class="v" id="simStd">—</div></div>
+        </div>
+        <p id="simVerdict" class="verdict" style="margin-top:10px"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div class="card mt quiz">
+    <h3>📝 Autoevaluación</h3>
+    <div class="ext-quiz" id="formCard" hidden>
+      <p><strong>Cuestionario oficial del equipo</strong><br><span class="muted">Contesta nuestro mini quiz de 3 preguntas.</span></p>
+      <a class="btn" id="formLink" href="#" target="_blank" rel="noopener">Abrir cuestionario ↗</a>
+    </div>
+    <p class="muted">Elige una respuesta en cada pregunta; verás la retroalimentación al instante.</p>
+    <div id="quiz"></div>
+    <p class="score" id="score"></p>
+    <button class="btn ghost" id="quizReset" type="button">Reintentar</button>
+  </div>
+
+  <div class="pager"><button class="btn ghost" data-go="caso">← Caso práctico</button><button class="btn" data-go="glosario">Volver al inicio ↺</button></div>
+</section>
+
+</main>
+
+<section class="wrap credits" aria-labelledby="credTitle">
+  <h2 id="credTitle">Equipo y fuentes</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Integrantes</h3>
+      <ul class="team-list" id="teamList"></ul>
+      <p class="muted" id="teamMeta" style="margin:0"></p>
+    </div>
+    <div class="card">
+      <h3>Fuentes consultadas</h3>
+      <ol class="refs">
+        <li>Chapra, S. C. y Canale, R. P. (2015). <em>Métodos numéricos para ingenieros</em> (7.ª ed.). McGraw-Hill.</li>
+        <li>Burden, R. L., Faires, J. D. y Burden, A. M. (2017). <em>Análisis numérico</em> (10.ª ed.). Cengage Learning.</li>
+        <li>Nieves Hurtado, A. (2014). <em>Métodos numéricos aplicados a la ingeniería</em> (4.ª ed.). Grupo Editorial Patria.</li>
+        <li>Goldberg, D. (1991). What every computer scientist should know about floating-point arithmetic. <em>ACM Computing Surveys, 23</em>(1), 5–48.</li>
+        <li>U.S. General Accounting Office (1992). <em>Patriot Missile Defense: Software Problem Led to System Failure at Dhahran, Saudi Arabia</em> (GAO/IMTEC-92-26).</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+
+<button class="to-top" id="toTop" type="button" aria-label="Volver arriba">↑</button>
+
+<script>
+/* =========================================================
+   EDITA AQUÍ los datos del equipo (se muestran en "Equipo y fuentes").
+   Los campos vacíos ('') no se muestran.
+   ========================================================= */
+const CONFIG = {
+  integrantes: [
+    { nombre: 'Alexis Carabeo Amaro', matricula: '233110187' },
+    { nombre: 'Catherine Stephany García Méndez', matricula: '233110397' },
+    { nombre: 'Yael Cruz Trejo', matricula: '' }
+  ],
+  materia: 'Matemáticas para Ingeniería 2',
+  carrera: '',      // p. ej. 'Ingeniería en Mecatrónica'
+  grupo: '901',
+  profesor: 'Mtra. Sakbe Contreras Carrillo',
+  formUrl: ''       // enlace a tu Google Forms / Kahoot / Quizizz (https://forms.gle/...)
+};
+
+(() => {
+  // ---------- Datos del equipo ----------
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const metaBits = [['Materia', CONFIG.materia], ['Carrera', CONFIG.carrera], ['Grupo', CONFIG.grupo], ['Docente', CONFIG.profesor]].filter(x => x[1]);
+  document.getElementById('teamList').innerHTML = CONFIG.integrantes.map(({ nombre, matricula }) => {
+    const ini = nombre.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    return `<li><span class="av">${esc(ini)}</span><span>${esc(nombre)}${matricula ? `<br><span class="muted mono" style="font-weight:400;font-size:.85rem">Matrícula ${esc(matricula)}</span>` : ''}</span></li>`;
+  }).join('');
+  document.getElementById('teamMeta').textContent = metaBits.map(([k, v]) => `${k}: ${v}`).join(' · ');
+  if (/^https?:\/\//.test(CONFIG.formUrl)) {
+    document.getElementById('formLink').href = CONFIG.formUrl;
+    document.getElementById('formCard').hidden = false;
+  }
+
+  // ---------- KaTeX helper ----------
+  const renderMath = el => { if (window.renderMathInElement) renderMathInElement(el, {
+    delimiters: [{ left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false }); };
+
+  // ---------- Tema ----------
+  const root = document.documentElement;
+  try { const t = localStorage.getItem('theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+  });
+
+  // ---------- Pestañas ----------
+  const tabs = [...document.querySelectorAll('[role=tab]')];
+  function show(id, scroll) {
+    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === id));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === id));
+    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+    if (scroll) window.scrollTo({ top: document.querySelector('nav.tabs').offsetTop, behavior: 'smooth' });
+  }
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab, window.scrollY > document.querySelector('nav.tabs').offsetTop)));
+  document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go, true)));
+  const initial = location.hash.slice(1);
+  if (tabs.some(t => t.dataset.tab === initial)) show(initial, false);
+
+  // ---------- Dianas comparativas ----------
+  const ns = 'http://www.w3.org/2000/svg';
+  function drawTarget(svg, pts) {
+    svg.innerHTML = '';
+    [[95, 'var(--target-ring)', 14], [65, 'var(--target-ring)', 14], [35, 'var(--target-ring)', 14]].forEach(([r, c, w]) => {
+      const el = document.createElementNS(ns, 'circle'); el.setAttribute('r', r); el.setAttribute('fill', 'none');
+      el.setAttribute('stroke', c); el.setAttribute('stroke-width', w); svg.appendChild(el);
+    });
+    const ctr = document.createElementNS(ns, 'circle'); ctr.setAttribute('r', 12); ctr.setAttribute('fill', 'var(--target-center)'); svg.appendChild(ctr);
+    pts.forEach(([x, y]) => {
+      const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 6);
+      c.setAttribute('fill', 'var(--primary)'); c.setAttribute('stroke', 'var(--surface)'); c.setAttribute('stroke-width', 1.5); svg.appendChild(c);
+    });
+  }
+  // generador pseudoaleatorio fijo para que las dianas de ejemplo no cambien
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const gauss = (r = Math.random) => { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+  const cases = [
+    ['Exacto y preciso', 'Agrupados en el centro', 0, 0, 7],
+    ['Preciso, no exacto', 'Agrupados pero desviados (sesgo)', 48, -38, 7],
+    ['Exacto, no preciso', 'Dispersos, promedio en el centro', 0, 0, 38],
+    ['Ni exacto ni preciso', 'Dispersos y desviados', -40, 35, 30]
+  ];
+  const tg = document.getElementById('targets');
+  cases.forEach(([t, d, bx, by, s]) => {
+    const fig = document.createElement('figure');
+    const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', '-100 -100 200 200'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', t);
+    const pts = []; for (let i = 0; i < 8; i++) pts.push([bx + gauss(rnd) * s, by + gauss(rnd) * s].map(v => Math.max(-90, Math.min(90, v))));
+    drawTarget(svg, pts);
+    fig.appendChild(svg);
+    const cap = document.createElement('figcaption'); cap.innerHTML = `<b>${t}</b><span class="muted">${d}</span>`; fig.appendChild(cap);
+    tg.appendChild(fig);
+  });
+
+  // ---------- Redondeo en vivo ----------
+  document.getElementById('liveRound').textContent = String(0.1 + 0.2);
+  let acc = 0; for (let i = 0; i < 10; i++) acc += 0.1;
+  document.getElementById('liveRound2').textContent = String(acc) + (acc === 1 ? '' : '  (≠ 1)');
+
+  // ---------- Serie de Taylor de e ----------
+  const nT = document.getElementById('nTerms');
+  function taylor() {
+    const n = +nT.value; let s = 0, f = 1;
+    for (let k = 0; k < n; k++) { if (k > 0) f *= k; s += 1 / f; }
+    document.getElementById('nTermsOut').textContent = n;
+    document.getElementById('taylorApprox').textContent = s.toFixed(10);
+    document.getElementById('taylorErr').textContent = Math.abs(Math.E - s).toExponential(3);
+    const dig = Math.max(0, Math.min(10, -Math.log10(Math.abs(Math.E - s) / Math.E) + Math.log10(0.5) + 2));
+    document.getElementById('taylorBar').style.width = (dig * 10) + '%';
+    document.getElementById('taylorDig').textContent = Math.floor(dig);
+  }
+  nT.addEventListener('input', taylor); taylor();
+
+  // ---------- Calculadora ----------
+  const consts = { e: Math.E, sqrt2: Math.SQRT2, pi: Math.PI, phi: (1 + Math.sqrt(5)) / 2 };
+  const sel = document.getElementById('trueSel'), tv = document.getElementById('trueVal'), av = document.getElementById('approxVal');
+  const fmt = (x, d = 10) => Number.isFinite(x) ? (Math.abs(x) !== 0 && (Math.abs(x) < 1e-4 || Math.abs(x) >= 1e8) ? x.toExponential(4) : (+x.toFixed(d)).toString()) : '—';
+
+  function sigTrunc(x, n) {
+    if (x === 0) return 0;
+    const k = Math.floor(Math.log10(Math.abs(x))), p = n - 1 - k;
+    // usamos toFixed con margen para evitar que 2.72999999 se trunque mal
+    const scaled = +(Math.abs(x) * Math.pow(10, p)).toPrecision(15);
+    return Math.sign(x) * Math.floor(scaled) / Math.pow(10, p);
+  }
+  const sigRound = (x, n) => x === 0 ? 0 : +x.toPrecision(n);
+  const showSig = (x, n) => { if (x === 0) return '0'; const k = Math.floor(Math.log10(Math.abs(x))); const d = n - 1 - k; return d >= 0 && d <= 20 ? x.toFixed(d) : x.toPrecision(n); };
+
+  function calc() {
+    if (sel.value !== 'custom') { tv.value = consts[sel.value]; tv.readOnly = true; } else tv.readOnly = false;
+    const v = parseFloat(tv.value), a = parseFloat(av.value);
+    const ok = Number.isFinite(v) && Number.isFinite(a) && v !== 0;
+    const ea = Math.abs(v - a), er = ea / Math.abs(v), ep = er * 100;
+    document.getElementById('outEa').textContent = ok ? fmt(ea) : '—';
+    document.getElementById('outEr').textContent = ok ? fmt(er) : '—';
+    document.getElementById('outEp').textContent = ok ? fmt(ep, 6) + ' %' : (v === 0 ? 'Vv ≠ 0' : '—');
+    let n = 0; if (ok) { if (ep === 0) n = '≥ 15'; else while (n < 16 && ep <= 0.5 * Math.pow(10, 2 - (n + 1))) n++; }
+    document.getElementById('outSf').textContent = ok ? n : '—';
+
+    const N = +document.getElementById('sfRange').value;
+    document.getElementById('sfOut').textContent = N;
+    const rows = [];
+    if (Number.isFinite(v) && v !== 0) {
+      [['Truncamiento', sigTrunc(v, N)], ['Redondeo', sigRound(v, N)]].forEach(([m, x]) => {
+        const e = Math.abs(v - x);
+        rows.push(`<tr><td class="type">${m}</td><td class="mono">${showSig(x, N)}</td><td class="mono">${fmt(e)}</td><td class="mono result">${fmt(e / Math.abs(v) * 100, 8)} %</td></tr>`);
+      });
+    } else rows.push('<tr><td colspan="4" class="muted">Escribe un valor verdadero distinto de cero.</td></tr>');
+    document.getElementById('sfTable').innerHTML = rows.join('');
+  }
+  sel.addEventListener('change', () => { if (sel.value === 'custom') { tv.value = ''; tv.focus(); } calc(); });
+  [tv, av, document.getElementById('sfRange')].forEach(el => el.addEventListener('input', calc));
+  calc();
+
+  // ---------- Simulador ----------
+  const sim = document.getElementById('simTarget'), bR = document.getElementById('biasR'), sR = document.getElementById('spreadR');
+  function shoot() {
+    const b = +bR.value, s = +sR.value, ang = Math.random() * 2 * Math.PI;
+    const bx = b * Math.cos(ang), by = b * Math.sin(ang), pts = [];
+    for (let i = 0; i < 12; i++) pts.push([bx + gauss() * s, by + gauss() * s].map(v => Math.max(-100, Math.min(100, v))));
+    drawTarget(sim, pts);
+    const mx = pts.reduce((a, p) => a + p[0], 0) / pts.length, my = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+    const mean = document.createElementNS(ns, 'path'); mean.setAttribute('d', `M${mx - 7} ${my} H${mx + 7} M${mx} ${my - 7} V${my + 7}`);
+    mean.setAttribute('stroke', 'var(--text)'); mean.setAttribute('stroke-width', 3); sim.appendChild(mean);
+    const dist = Math.hypot(mx, my);
+    const sd = Math.sqrt(pts.reduce((a, p) => a + (p[0] - mx) ** 2 + (p[1] - my) ** 2, 0) / (pts.length - 1));
+    document.getElementById('simBias').textContent = dist.toFixed(1) + ' u';
+    document.getElementById('simStd').textContent = sd.toFixed(1) + ' u';
+    const exacto = dist < 15, preciso = sd < 20;
+    const v = document.getElementById('simVerdict');
+    v.textContent = (exacto ? 'Exacto' : 'No exacto') + ' y ' + (preciso ? 'preciso' : 'no preciso') + (exacto && preciso ? ' 🎯' : '');
+    v.className = 'verdict ' + (exacto && preciso ? 'ok' : 'bad');
+  }
+  const lbl = () => { document.getElementById('biasOut').textContent = bR.value; document.getElementById('spreadOut').textContent = sR.value; };
+  bR.addEventListener('input', () => { lbl(); shoot(); }); sR.addEventListener('input', () => { lbl(); shoot(); });
+  document.getElementById('shootBtn').addEventListener('click', shoot);
+  lbl(); shoot();
+
+  // ---------- Quiz ----------
+  const Q = [
+    { q: 'Una báscula siempre marca 2 kg de más, aunque sus lecturas casi no varían. ¿Cómo la describes?',
+      o: ['Exacta pero no precisa', 'Precisa pero no exacta (tiene sesgo)', 'Exacta y precisa', 'Ni exacta ni precisa'], a: 1,
+      f: 'Sus lecturas se repiten (precisa), pero están corridas del valor real por un sesgo constante (no exacta).' },
+    { q: 'El valor real es 50 y la aproximación 49. ¿Cuál es el error relativo porcentual?',
+      o: ['1 %', '2 %', '0.02 %', '49 %'], a: 1, f: 'Eₐ = |50 − 49| = 1  →  Eᵣ = 1/50 = 0.02  →  E% = 2 %.' },
+    { q: '¿Cuántas cifras significativas tiene 0.004060?', o: ['7', '3', '4', '6'], a: 2,
+      f: 'Los ceros a la izquierda no cuentan; se cuentan 4, 0, 6 y el 0 final (que indica la resolución): 4 cifras.' },
+    { q: 'Calcular sen(x) usando solo los 3 primeros términos de su serie de Taylor produce error por…',
+      o: ['Redondeo', 'Truncamiento', 'Sesgo del instrumento', 'Incertidumbre de medición'], a: 1,
+      f: 'Cortar una serie infinita en un número finito de términos es error por truncamiento.' },
+    { q: '¿Por qué 0.1 + 0.2 da 0.30000000000000004 en una computadora?',
+      o: ['Por un error de programación', 'Por truncamiento de una serie', 'Porque 0.1 no se puede guardar exacto en binario (redondeo)', 'Por el sesgo del procesador'], a: 2,
+      f: '0.1 en binario tiene infinitos dígitos; la máquina lo guarda redondeado y ese pequeño error aparece en la suma.' }
+  ];
+  const qz = document.getElementById('quiz'), sc = document.getElementById('score');
+  let answered = 0, correct = 0;
+  function buildQuiz() {
+    answered = 0; correct = 0; sc.textContent = ''; qz.innerHTML = '';
+    Q.forEach((item, i) => {
+      const d = document.createElement('div'); d.className = 'q';
+      d.innerHTML = `<strong>${i + 1}. ${item.q}</strong><div class="opts"></div><div class="fb" aria-live="polite"></div>`;
+      const opts = d.querySelector('.opts'), fb = d.querySelector('.fb');
+      item.o.forEach((txt, j) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'opt'; b.textContent = txt;
+        b.addEventListener('click', () => {
+          opts.querySelectorAll('button').forEach((x, k) => { x.disabled = true; if (k === item.a) x.classList.add('correct'); });
+          const good = j === item.a; if (!good) b.classList.add('wrong');
+          fb.innerHTML = (good ? '<span class="verdict ok">✔ Correcto.</span> ' : '<span class="verdict bad">✘ Incorrecto.</span> ') + item.f;
+          answered++; if (good) correct++;
+          if (answered === Q.length) sc.textContent = `Resultado: ${correct} / ${Q.length} ${correct === Q.length ? '— ¡Excelente! 🏆' : correct >= 3 ? '— ¡Bien!' : '— Repasa las secciones 1 y 2.'}`;
+        });
+        opts.appendChild(b);
+      });
+      qz.appendChild(d);
+    });
+  }
+  document.getElementById('quizReset').addEventListener('click', buildQuiz);
+  buildQuiz();
+
+  // ---------- Sección 3: caso práctico dinámico ----------
+  const CASES = {
+    e:     { tex: 'e',        nombre: 'el número de Euler', v: '2.718281828' },
+    sqrt2: { tex: '\\sqrt{2}', nombre: 'la raíz cuadrada de 2', v: '1.414213562' }
+  };
+  const caseBody = document.getElementById('caseBody');
+  function buildCase(key) {
+    const c = CASES[key], vv = +c.v;
+    const digits = c.v.replace('.', '');
+    const tStr = c.v.slice(0, 4), d4 = +digits[3], rStr = vv.toPrecision(3);
+    const calc = va => { const ea = Math.abs(vv - va); const eaS = ea.toFixed(9); const er = (+eaS / vv).toFixed(7); const ep = (+er * 100).toFixed(4); return { eaS, er, ep, sign: vv - va < 0 }; };
+    const T = calc(+tStr), R = calc(+rStr);
+    const same = tStr === rStr;
+    const rest = c.v.slice(4);
+    const roundTxt = d4 >= 5
+      ? `La 4.ª cifra es ${d4} (≥ 5), así que la 3.ª sube de ${digits[2]} a ${+digits[2] + 1}:`
+      : `La 4.ª cifra es ${d4} (< 5), así que la 3.ª se queda igual:`;
+    const eaLine = (va, X) => `\\[E_a = |${c.v} - ${va}|\\]\\[E_a = \\mathbf{${X.eaS}}\\]`;
+    const col = (title, body) => `<div class="col"><h4>${title}</h4>${body}</div>`;
+
+    // escenarios
+    const terr = X => (200 * X.ep / 100 * 100).toFixed(1);      // cm en 200 m
+    const aero = X => (80 * X.ep / 100).toFixed(3);              // mm en 80 mm
+    const ratio = (+T.ep / +R.ep);
+
+    // gráfica de barras
+    const tol = 0.0125, max = Math.max(+T.ep, +R.ep, tol) * 1.35;
+    const W = 640, L = 120, Rr = 30, bw = W - L - Rr, x = v => L + v / max * bw;
+    const bar = (y, lbl, v, color) => `<text x="${L - 10}" y="${y + 21}" text-anchor="end" font-weight="700">${lbl}</text>
+      <rect x="${L}" y="${y}" width="${Math.max(2, x(v) - L)}" height="32" rx="6" fill="${color}"/>
+      <text x="${x(v) + 8}" y="${y + 21}" font-weight="700">${v} %</text>`;
+    const chart = `<svg class="chart" viewBox="0 0 ${W} 170" role="img" aria-label="Barras de error porcentual: truncado ${T.ep}%, redondeado ${R.ep}%">
+      <line class="axis" x1="${L}" y1="10" x2="${L}" y2="125"/>
+      ${bar(20, 'Truncado', T.ep, 'var(--bad)')}
+      ${bar(70, 'Redondeado', R.ep, 'var(--ok)')}
+      <line x1="${x(tol)}" y1="10" x2="${x(tol)}" y2="125" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+      <text x="${x(tol)}" y="148" text-anchor="middle" style="fill:var(--accent)" font-size="12">tolerancia aeroespacial 0.0125 %</text>
+    </svg>`;
+
+    const interp = same
+      ? `<p>En este caso <strong>truncar y redondear dan el mismo resultado (${tStr})</strong>, porque la cifra que se elimina (${d4}) es menor que 5. El truncamiento sólo "pierde" contra el redondeo cuando la cifra eliminada es 5 o más; eso pasa aproximadamente la mitad de las veces, y por eso, a la larga, truncar introduce un <em>sesgo</em> hacia abajo (compáralo con el caso de \\(e\\)). Un error de ${T.ep} % suena pequeño, pero que sea aceptable depende de la tolerancia de cada aplicación:</p>`
+      : `<p>Con las mismas 3 cifras, <strong>redondear dio un error ${ratio.toFixed(1)} veces menor que truncar</strong> (${R.ep} % contra ${T.ep} %). Además, el truncamiento siempre se queda corto: si un programa trunca en cada operación, el error no se compensa, se acumula hacia el mismo lado (es un <em>sesgo</em>). Un error de ${R.ep} % o ${T.ep} % suena pequeño, pero que sea aceptable depende de la tolerancia de cada aplicación:</p>`;
+    const both = same ? `${terr(T)} cm` : `${terr(T)} cm truncando y ${terr(R)} cm redondeando`;
+    const bothA = same ? `un error de ${aero(T)} mm` : `${aero(T)} mm truncando y ${aero(R)} mm redondeando`;
+
+    caseBody.innerHTML = `
+    <div class="steps">
+      <div class="card step">
+        <h3>Planteamiento</h3>
+        <p>Valor verdadero de ${c.nombre} (con suficientes dígitos para que no influya en el cálculo):</p>
+        \\[V_v = ${c.tex} = ${c.v}\\ldots\\]
+        <div class="compare">
+          ${col('A) Truncado a 3 cifras', `<p>Se conservan 3 cifras (${digits[0]}, ${digits[1]}, ${digits[2]}) y el resto <em>se corta</em> sin mirar:</p>\\[${tStr}\\cancel{${rest}\\ldots} \\;\\Rightarrow\\; V_a = ${tStr}\\]`)}
+          ${col('B) Redondeado a 3 cifras', `<p>${roundTxt}</p>\\[${tStr}\\underline{${d4}}\\ldots \\;\\Rightarrow\\; V_a = ${rStr}\\]`)}
+        </div>
+      </div>
+      <div class="card step">
+        <h3>Error absoluto</h3><p>\\(E_a = |V_v - V_a|\\)</p>
+        <div class="compare">${col('A) Truncado', eaLine(tStr, T))}${col('B) Redondeado', eaLine(rStr, R))}</div>
+      </div>
+      <div class="card step">
+        <h3>Error relativo</h3><p>\\(E_r = \\dfrac{E_a}{|V_v|}\\)</p>
+        <div class="compare">
+          ${col('A) Truncado', `\\[E_r = \\frac{${T.eaS}}{${c.v}} = \\mathbf{${T.er}}\\]`)}
+          ${col('B) Redondeado', `\\[E_r = \\frac{${R.eaS}}{${c.v}} = \\mathbf{${R.er}}\\]`)}
+        </div>
+      </div>
+      <div class="card step">
+        <h3>Error relativo porcentual</h3><p>\\(E_\\% = E_r \\times 100\\%\\)</p>
+        <div class="compare">
+          ${col('A) Truncado', `\\[E_\\% = ${T.er} \\times 100 = \\mathbf{${T.ep}\\,\\%}\\]`)}
+          ${col('B) Redondeado', `\\[E_\\% = ${R.er} \\times 100 = \\mathbf{${R.ep}\\,\\%}\\]`)}
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap mt">
+      <table>
+        <thead><tr><th>Aproximación</th><th>\\(V_a\\)</th><th>\\(E_a\\)</th><th>\\(E_r\\)</th><th>\\(E_\\%\\)</th></tr></thead>
+        <tbody>
+          <tr><td class="type">Truncada</td><td class="mono">${tStr}</td><td class="mono">${T.eaS}</td><td class="mono">${T.er}</td><td class="mono result">${T.ep} %</td></tr>
+          <tr><td class="type">Redondeada</td><td class="mono">${rStr}</td><td class="mono">${R.eaS}</td><td class="mono">${R.er}</td><td class="mono result">${R.ep} %</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card mt">
+      <h3>Comparación visual del error porcentual</h3>
+      ${chart}
+      <p class="muted" style="font-size:.9rem;margin:6px 0 0">La línea punteada marca una tolerancia típica de una pieza aeroespacial (±0.01 mm en 80 mm).</p>
+    </div>
+
+    <div class="card mt">
+      <h3>Interpretación en ingeniería</h3>
+      ${interp}
+      <div class="scenario">
+        <div class="card">
+          <span class="verdict ok">✔ Aceptable</span>
+          <h4 style="margin:.3rem 0">Topografía de un terreno de 200 m</h4>
+          <p style="margin:0">El error equivale a ${both}. Para un lote habitacional o un cálculo de volumen de tierra es tolerable, porque las propias mediciones de campo tienen incertidumbres de ese orden.</p>
+        </div>
+        <div class="card bad">
+          <span class="verdict bad">✘ Catastrófico</span>
+          <h4 style="margin:.3rem 0">Pieza aeroespacial de 80 mm</h4>
+          <p style="margin:0">Una flecha de turbina con tolerancia de ±0.01 mm (0.0125 %). El error sería de ${bothA}: ${same ? 'supera' : '<strong>ambos</strong> superan'} la tolerancia (ver la línea punteada). La pieza vibraría o fallaría por fatiga. Aquí 3 cifras no alcanzan: se necesitan 6 o más.</p>
+        </div>
+        <div class="card bad">
+          <span class="verdict bad">✘ Se acumula</span>
+          <h4 style="margin:.3rem 0">Cálculos encadenados</h4>
+          <p style="margin:0">En una simulación que repite una operación miles de veces, truncar en cada paso hace crecer el error sin parar. Por eso los programas trabajan en doble precisión (~16 cifras) y sólo redondean al mostrar el resultado. Míralo en la <a href="#interactiva" data-go="interactiva">Zona interactiva</a>.</p>
+        </div>
+      </div>
+    </div>`;
+    caseBody.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', ev => { ev.preventDefault(); show(b.dataset.go, true); }));
+    renderMath(caseBody);
+  }
+  document.querySelectorAll('.seg-btn').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.seg-btn').forEach(x => x.setAttribute('aria-pressed', x === b));
+    buildCase(b.dataset.case);
+  }));
+  buildCase('e');
+
+  // ---------- Ejercicio ----------
+  const EX = [
+    { q: '\\(\\pi = 3.14159265\\ldots\\) aproximado con la fracción \\(\\tfrac{22}{7} = 3.142857\\ldots\\)', v: Math.PI, a: 22 / 7, vs: '3.14159265', as: '3.14285714' },
+    { q: '\\(\\pi = 3.14159265\\ldots\\) aproximado como \\(3.14\\)', v: Math.PI, a: 3.14, vs: '3.14159265', as: '3.14' },
+    { q: '\\(e = 2.71828183\\ldots\\) aproximado como \\(2.7\\)', v: Math.E, a: 2.7, vs: '2.71828183', as: '2.7' },
+    { q: '\\(\\sqrt{2} = 1.41421356\\ldots\\) aproximado como \\(1.4\\)', v: Math.SQRT2, a: 1.4, vs: '1.41421356', as: '1.4' },
+    { q: 'Gravedad estándar \\(g = 9.80665\\) m/s² aproximada como \\(9.81\\) m/s²', v: 9.80665, a: 9.81, vs: '9.80665', as: '9.81' },
+    { q: 'Gravedad estándar \\(g = 9.80665\\) m/s² aproximada como \\(10\\) m/s²', v: 9.80665, a: 10, vs: '9.80665', as: '10' },
+    { q: '\\(\\tfrac{1}{3} = 0.333333\\ldots\\) aproximado como \\(0.33\\)', v: 1 / 3, a: 0.33, vs: '0.33333333', as: '0.33' }
+  ];
+  let exI = 0;
+  const exQ = document.getElementById('exQ'), exAns = document.getElementById('exAns'), exFb = document.getElementById('exFb'), exSol = document.getElementById('exSol');
+  const exData = () => { const x = EX[exI], ea = Math.abs(x.v - x.a), er = ea / Math.abs(x.v); return { x, ea, er, ep: er * 100 }; };
+  function loadEx() {
+    exQ.innerHTML = `<strong>Ejercicio ${exI + 1} de ${EX.length}:</strong> ${EX[exI].q}`;
+    exAns.value = ''; exFb.innerHTML = ''; exSol.hidden = true; renderMath(exQ);
+  }
+  document.getElementById('exCheck').addEventListener('click', () => {
+    const u = parseFloat(exAns.value), { ep } = exData();
+    if (!Number.isFinite(u)) { exFb.innerHTML = '<span class="verdict bad">Escribe un número.</span> Usa punto decimal, sin el signo %.'; return; }
+    const ok = Math.abs(u - ep) <= Math.max(0.02 * ep, 0.0006);
+    exFb.innerHTML = ok ? `<span class="verdict ok">✔ ¡Correcto!</span> El valor exacto es ${ep.toPrecision(4)} %.`
+      : `<span class="verdict bad">✘ Todavía no.</span> ${u > ep * 50 ? '¿Olvidaste dividir entre el valor verdadero?' : u * 50 < ep ? '¿Olvidaste multiplicar por 100?' : 'Revisa tus operaciones.'} Intenta otra vez o mira la solución.`;
+  });
+  document.getElementById('exSolBtn').addEventListener('click', () => {
+    const { x, ea, er, ep } = exData();
+    exSol.innerHTML = `Eₐ = |${x.vs} − ${x.as}| = ${ea.toPrecision(5)}<br>Eᵣ = ${ea.toPrecision(5)} / ${x.vs} = ${er.toPrecision(5)}<br>E% = ${er.toPrecision(5)} × 100 = <strong>${ep.toPrecision(4)} %</strong>`;
+    exSol.hidden = false;
+  });
+  document.getElementById('exNext').addEventListener('click', () => { exI = (exI + 1) % EX.length; loadEx(); });
+  exAns.addEventListener('keydown', ev => { if (ev.key === 'Enter') document.getElementById('exCheck').click(); });
+  loadEx();
+
+  // ---------- Error acumulado ----------
+  let accSeed = 12345;
+  const accN = document.getElementById('accN'), accChart = document.getElementById('accChart');
+  function accum() {
+    const N = +accN.value; document.getElementById('accNOut').textContent = N;
+    let sd = accSeed; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    let exact = 0, st = 0, sr = 0; const eT = [0], eR = [0];
+    const chop2 = v => Math.floor(+(v * 100).toPrecision(12)) / 100, round2 = v => Math.round(+(v * 100).toPrecision(12)) / 100;
+    for (let k = 1; k <= N; k++) {
+      const x = 0.5 + r();                 // lectura con muchos decimales
+      exact += x; st = chop2(st + x); sr = round2(sr + x);
+      eT.push(exact - st); eR.push(exact - sr);
+    }
+    document.getElementById('accT').textContent = eT[N].toFixed(3) + ' L';
+    document.getElementById('accR').textContent = Math.abs(eR[N]).toFixed(3) + ' L';
+    const W = 640, H = 280, l = 56, rr = 16, t = 16, b = 40;
+    const ymax = Math.max(...eT.map(Math.abs), ...eR.map(Math.abs)) * 1.1 || 1, ymin = Math.min(0, ...eR) * 1.1;
+    const X = k => l + k / N * (W - l - rr), Y = v => t + (ymax - v) / (ymax - ymin) * (H - t - b);
+    const path = arr => arr.map((v, k) => (k ? 'L' : 'M') + X(k).toFixed(1) + ' ' + Y(v).toFixed(1)).join('');
+    let g = '';
+    for (let i = 0; i <= 4; i++) { const v = ymin + (ymax - ymin) * i / 4; g += `<line class="grid-l" x1="${l}" x2="${W - rr}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${l - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="12">${v.toFixed(2)}</text>`; }
+    for (let i = 0; i <= 4; i++) { const k = Math.round(N * i / 4); g += `<text x="${X(k)}" y="${H - b + 18}" text-anchor="middle" font-size="12">${k}</text>`; }
+    accChart.innerHTML = `${g}
+      <line class="axis" x1="${l}" y1="${Y(0)}" x2="${W - rr}" y2="${Y(0)}" stroke-width="1.5"/>
+      <text x="${(l + W - rr) / 2}" y="${H - 4}" text-anchor="middle" font-size="12">segundos</text>
+      <text x="14" y="${(t + H - b) / 2}" text-anchor="middle" font-size="12" transform="rotate(-90 14 ${(t + H - b) / 2})">error (L)</text>
+      <path d="${path(eT)}" fill="none" stroke="var(--bad)" stroke-width="2.5"/>
+      <path d="${path(eR)}" fill="none" stroke="var(--ok)" stroke-width="2.5"/>
+      <circle cx="${X(N)}" cy="${Y(eT[N])}" r="4.5" fill="var(--bad)"/><circle cx="${X(N)}" cy="${Y(eR[N])}" r="4.5" fill="var(--ok)"/>`;
+  }
+  accN.addEventListener('input', accum);
+  document.getElementById('accNew').addEventListener('click', () => { accSeed = Math.floor(Math.random() * 2e9) + 1; accum(); });
+  accum();
+
+  // ---------- Volver arriba ----------
+  const toTop = document.getElementById('toTop');
+  addEventListener('scroll', () => toTop.classList.toggle('show', scrollY > 600), { passive: true });
+  toTop.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ---------- KaTeX ----------
+  const renderAll = () => renderMath(document.body);
+  if (window.renderMathInElement) renderAll(); else window.addEventListener('load', renderAll);
+})();
+</script>
+</body>
+</html>
